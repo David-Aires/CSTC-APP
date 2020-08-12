@@ -19,7 +19,7 @@ import {
 
 import bgImage from '../src/img/background.jpg'
 import logo from '../src/img/icon.png'
-import { StackActions, NavigationActions } from 'react-navigation';
+import '../src/components/global'
 import Icon from 'react-native-vector-icons/Ionicons'
 
 
@@ -67,7 +67,7 @@ const { width: WIDTH}= Dimensions.get('window')
   async storeToken(user) {
     try {
        await AsyncStorage.setItem("userData", user);
-       this.getToken()
+       global.Token = this.getToken()
     } catch (error) {
       console.log("Something went wrong", error);
     }
@@ -96,6 +96,8 @@ const { width: WIDTH}= Dimensions.get('window')
       .then((responseJson) => {
         if(responseJson.token) {
           this.storeToken(responseJson.token)
+          global.Email = email
+          global.Pass = password
           this.props.navigation.navigate("Dashboard")
         } else {
           alert('wrong');
