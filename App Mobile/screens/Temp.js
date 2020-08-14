@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, FlatList, ActivityIndicator, Image, TextInput} from "react-native";
+import { View, Text, FlatList, ActivityIndicator, Image, TextInput, AsyncStorage} from "react-native";
 import { List, ListItem, SearchBar } from "react-native-elements";
 import {Header,Left,Icon} from 'native-base'
-
+import '../src/components/global.js'
 
 export default class Temp extends React.Component {
   constructor(props) {
@@ -11,10 +11,10 @@ export default class Temp extends React.Component {
     this.state = {
       loading: false,
       data: [],
-      page: 1,
-      seed: 1,
       error: null,
-      refreshing: false
+      refreshing: false,
+      email:"",
+      password:""
     };
   }
   
@@ -23,19 +23,29 @@ export default class Temp extends React.Component {
   }
 
   componentDidMount() {
+    this.getGlobal();
     this.makeRemoteRequest();
   }
 
+  async getGlobal() {
+    try {
+      this.setState({ email: await AsyncStorage.getItem("global.Email")});
+      this.setState({ password: await AsyncStorage.getItem("global.Pass")});
+      
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+  }
+
   makeRemoteRequest = () => {
-    const { page, seed } = this.state;
-    const url = `https://randomuser.me/api/?seed=${seed}&page=${page}&results=20`;
+    const url = `https://digitalconstructionhub.ovh/api/api.php?email=${this.state.email}&pass=${this.state.password}&asset=true`;
     this.setState({ loading: true });
 
     fetch(url)
       .then(res => res.json())
       .then(res => {
         this.setState({
-          data: page === 1 ? res.results : [...this.state.data, ...res.results],
+          data: res,
           error: res.error || null,
           loading: false,
           refreshing: false
@@ -49,8 +59,6 @@ export default class Temp extends React.Component {
   handleRefresh = () => {
     this.setState(
       {
-        page: 1,
-        seed: this.state.seed + 1,
         refreshing: true
       },
       () => {
@@ -61,9 +69,7 @@ export default class Temp extends React.Component {
 
   handleLoadMore = () => {
     this.setState(
-      {
-        page: this.state.page + 1
-      },
+      {},
       () => {
         this.makeRemoteRequest();
       }
@@ -86,7 +92,7 @@ export default class Temp extends React.Component {
   renderHeader = () => {
     return (
       <SearchBar
-        placeholder="   Type Name..."
+        placeholder="  Recherche.."
         onChangeText={text => this.searchItems(text)}
         value={this.state.value}
       />
@@ -111,7 +117,7 @@ export default class Temp extends React.Component {
 
   searchItems = text => {
     let newData = this.state.data.filter(item => {
-      const itemData = `${item.name.first.toUpperCase()}`;
+      const itemData = `${item.name.toUpperCase()}`;
       const textData = text.toUpperCase();
     if(text.length >0 ){
       return itemData.indexOf(textData) > -1;
@@ -139,13 +145,12 @@ export default class Temp extends React.Component {
           renderItem={({ item }) => (
             <ListItem
               roundAvatar
-              title={`${item.name.first} ${item.name.last}`}
-              subtitle={item.email}
-              avatar={{ uri: item.picture.thumbnail }}
+              title={`${item.name}`}
+              subtitle={item.id}
               containerStyle={{ borderBottomWidth: 0 }}
             />
           )}
-          keyExtractor={item => item.email}
+          keyExtractor={item => item.name}
           ItemSeparatorComponent={this.renderSeparator}
           ListHeaderComponent={this.renderHeader}
           ListFooterComponent={this.renderFooter}

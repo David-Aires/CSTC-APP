@@ -8,6 +8,9 @@ import {
   SafeAreaView,
   ScrollView,
   Dimensions,
+  TouchableOpacity,
+  AsyncStorage,
+  Alert
  } from 'react-native';
 
 
@@ -38,6 +41,22 @@ const CustomDrawerComponent = (props) => (
     </View>
     <ScrollView>
       <DrawerNavigatorItems {...props}/>
+        <TouchableOpacity onPress={()=>
+              Alert.alert(
+                'Log out',
+                'Voulez-vous vous déconnecter?',
+                [
+                  {text: 'Annuler', onPress: () => {return null}},
+                  {text: 'Confirmer', onPress: () => {
+                    AsyncStorage.clear();
+                    props.navigation.navigate('HomeScreen')
+                  }},
+                ],
+                { cancelable: false }
+              )  
+            }>
+              <Text style={{margin: 16,fontWeight: 'bold',color:'#FF0000'}}>Déconnexion</Text>
+        </TouchableOpacity>
     </ScrollView>
     <View style={{alignItems:'center',position: 'absolute', left: 0, right: 0, bottom: 0}}><Text style={{color: '#fff',fontWeight:'bold'}}>Copyright © 2019 GREEN-R</Text></View>
   </SafeAreaView>
