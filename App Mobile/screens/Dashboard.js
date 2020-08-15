@@ -38,7 +38,7 @@ export default class Dashboard extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <Header style={{backgroundColor:'#483a9c'}}>
+        <Header style={{backgroundColor:'#008585'}}>
           <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
           <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
           </View>

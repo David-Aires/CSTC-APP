@@ -15,6 +15,18 @@ function getAsset($customerId) {
     echo json_encode($response, JSON_PRETTY_PRINT);
 }
 
+/*========================================== GetUser =================================================*/
+function getUser($email) {
+    global $conn;
+    $result = pg_query($conn, "select authority, email , coalesce(first_name,'') as first_name , coalesce(last_name,'') as last_name from tb_user where email='".$email."'");
+    while($row = pg_fetch_object($result))
+    {
+        $response[] = $row;
+    }
+    header('Content-Type: application/json');
+    echo json_encode($response, JSON_PRETTY_PRINT);
+}
+
 
 switch(true) {
     case (!empty($_GET["email"]) AND !empty($_GET["pass"])):
@@ -25,6 +37,8 @@ switch(true) {
 
         if(!empty($_GET["asset"])) {
             getAsset($usr_data->customerId);
+        } elseif(!empty($_GET["profile"])) {
+            getUser($usr_data->sub);
         }
     break;
 

@@ -23,8 +23,9 @@ export default class Temp extends React.Component {
   }
 
   componentDidMount() {
-    this.getGlobal();
-    this.makeRemoteRequest();
+    this.getGlobal().then(
+      () => {this.makeRemoteRequest();}
+    );
   }
 
   async getGlobal() {
@@ -132,7 +133,7 @@ export default class Temp extends React.Component {
   render() {
     return (
       <View>
-        <Header style={{backgroundColor:'#483a9c'}}>
+        <Header style={{backgroundColor:'#008585'}}>
           <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
           <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
           </View>

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^10.2.0",
+    "avataaars": "^1.2.1",
     "expo": "^35.0.0",
     "native-base": "^2.13.8",
     "react": "16.8.3",

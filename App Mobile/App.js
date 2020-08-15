@@ -24,6 +24,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import Dashboard from './screens/Dashboard'
 import HomeScreen from './screens/homeScreen'
 import Temp from './screens/Temp'
+import Profile from './screens/Profile'
 
 
 const MainNavigator = createStackNavigator({
@@ -34,9 +35,9 @@ const MainNavigator = createStackNavigator({
 });
 
 const CustomDrawerComponent = (props) => (
-  <SafeAreaView style={{flex:1, backgroundColor:'#483a9c'}}>
-    <View style={{height:150,backgroundColor: '#483a9c', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
-      <Text style={{color: '#fff',fontWeight:'bold',fontSize:20}}>Green</Text>
+  <SafeAreaView style={{flex:1, backgroundColor:'#008585'}}>
+    <View style={{height:150,backgroundColor: '#008585', alignItems:'center',justifyContent:'center', flexDirection:'row'}}>
+      <Text style={{color: '#fff',fontWeight:'bold',fontSize:20}}>CSTC</Text>
       <Image source={require('./src/img/icon.png')} style={{height: 60, width:70}} />
     </View>
     <ScrollView>
@@ -58,7 +59,7 @@ const CustomDrawerComponent = (props) => (
               <Text style={{margin: 16,fontWeight: 'bold',color:'#FF0000'}}>Déconnexion</Text>
         </TouchableOpacity>
     </ScrollView>
-    <View style={{alignItems:'center',position: 'absolute', left: 0, right: 0, bottom: 0}}><Text style={{color: '#fff',fontWeight:'bold'}}>Copyright © 2019 GREEN-R</Text></View>
+    <View style={{alignItems:'center',position: 'absolute', left: 0, right: 0, bottom: 0}}><Text style={{color: '#fff',fontWeight:'bold'}}>Copyright © 2020 CSTC</Text></View>
   </SafeAreaView>
 )
 
@@ -70,11 +71,12 @@ const MainDrawer = createDrawerNavigator({
       drawerIcon: ({tintColor}) => (<Icon name='streetview' style={{fontSize:14,color:tintColor}}></Icon>)
     }
   },
-  Temp: Temp
+  Temp: Temp,
+  Profile:Profile
 }, {
   contentComponent: CustomDrawerComponent,
   contentOptions: {
-    activeTintColor: 'yellowgreen',
+    activeTintColor: '#C5E1A5',
     inactiveTintColor: '#fff'
   }
 }
