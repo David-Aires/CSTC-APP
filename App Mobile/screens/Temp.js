@@ -14,11 +14,14 @@ export default class Temp extends React.Component {
       error: null,
       refreshing: false,
       email:"",
-      password:""
+      password:"",
+      searchText: "",
+      filteredData: []
     };
   }
   
   static navigationOptions = {
+    header: null,
     title: 'Modules',
   }
 
@@ -95,7 +98,7 @@ export default class Temp extends React.Component {
       <SearchBar
         placeholder="  Recherche.."
         onChangeText={text => this.searchItems(text)}
-        value={this.state.value}
+        value={this.state.searchText}
       />
     )
   };
@@ -117,18 +120,16 @@ export default class Temp extends React.Component {
   };
 
   searchItems = text => {
-    let newData = this.state.data.filter(item => {
-      const itemData = `${item.name.toUpperCase()}`;
-      const textData = text.toUpperCase();
-    if(text.length >0 ){
-      return itemData.indexOf(textData) > -1;
-    }
+    this.setState({searchText: text});
+
+    let filteredData = this.state.data.filter(function (item) {
+      return item.name.includes(text);
     });
-    this.setState({
-      data: newData,
-      value: text,
-    });
+
+    this.setState({filteredData: filteredData});
   };
+
+  
 
   render() {
     return (
@@ -142,13 +143,14 @@ export default class Temp extends React.Component {
           </Left>
         </Header>
         <FlatList
-          data={this.state.data}
+          data={this.state.filteredData && this.state.filteredData.length > 0 ? this.state.filteredData : this.state.data}
           renderItem={({ item }) => (
             <ListItem
-              roundAvatar
+              chevron={{color:'black'}}
               title={`${item.name}`}
               subtitle={item.id}
               containerStyle={{ borderBottomWidth: 0 }}
+              onPress={()=> {this.props.navigation.navigate('Devices',{id:`${item.id}`,email:`${this.state.email}`,pass:`${this.state.password}`})}}
             />
           )}
           keyExtractor={item => item.name}

@@ -28,6 +28,28 @@ function getUser($email) {
 }
 
 
+/*========================================== DelUser =================================================*/
+function delUser($id,$token) {
+    $data = api_del('https://dashboard.digitalconstructionhub.ovh/api/user/'.$id,'thgd',$token);
+}
+
+
+/*========================================== GetDevices =================================================*/
+function getDevices($id) {
+    global $conn;
+    $result = pg_query($conn, "select name, id, type from device
+                                where id in (select to_id from relation 
+                                    where to_type = 'DEVICE' and from_id ='".$id."' and relation_type = 'Contains')
+    ");
+    while($row = pg_fetch_object($result))
+    {
+        $response[] = $row;
+    }
+    header('Content-Type: application/json');
+    echo json_encode($response, JSON_PRETTY_PRINT);
+}
+
+
 switch(true) {
     case (!empty($_GET["email"]) AND !empty($_GET["pass"])):
         $email = $_GET["email"];
@@ -37,8 +59,15 @@ switch(true) {
 
         if(!empty($_GET["asset"])) {
             getAsset($usr_data->customerId);
+
         } elseif(!empty($_GET["profile"])) {
             getUser($usr_data->sub);
+
+        } elseif(!empty($_GET["delete"])) {
+            delUser($usr_data->userId,$token);
+
+        } elseif(!empty($_GET["devices"]) AND !empty($_GET["id"]) ) {
+            getDevices($_GET["id"]);
         }
     break;
 

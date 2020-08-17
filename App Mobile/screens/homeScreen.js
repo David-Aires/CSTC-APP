@@ -34,14 +34,18 @@ const { width: WIDTH}= Dimensions.get('window')
       press: false,
       email: "",
       password: "",
-      userData: ""
+      userData: "",
+      token: ""
     }
   }
 
   componentDidMount() {
-    if(this.getToken()) {
-      this.props.navigation.navigate('Dashboard')
-    }
+    this.getToken()
+    .then( () => {
+      if(this.state.token) {
+        this.props.navigation.navigate('Dashboard')
+      }
+    })    
  }
 
   static navigationOptions = {
@@ -75,7 +79,7 @@ const { width: WIDTH}= Dimensions.get('window')
   async getToken(user) {
     try {
       let Data = await AsyncStorage.getItem("userData");
-      console.log(Data);
+      this.setState({ token: Data });
     } catch (error) {
       console.log("Something went wrong", error);
     }

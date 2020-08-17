@@ -25,6 +25,7 @@ import Dashboard from './screens/Dashboard'
 import HomeScreen from './screens/homeScreen'
 import Temp from './screens/Temp'
 import Profile from './screens/Profile'
+import Devices from './screens/devices';
 
 
 const MainNavigator = createStackNavigator({
@@ -32,7 +33,17 @@ const MainNavigator = createStackNavigator({
     screen: HomeScreen,
   },
   Dashboard: Dashboard,
+  Devices:Devices
 });
+
+const clearAppData = async function() {
+  try {
+      const keys = await AsyncStorage.getAllKeys();
+      await AsyncStorage.multiRemove(keys);
+  } catch (error) {
+      console.error('Error clearing app data.');
+  }
+}
 
 const CustomDrawerComponent = (props) => (
   <SafeAreaView style={{flex:1, backgroundColor:'#008585'}}>
@@ -49,8 +60,8 @@ const CustomDrawerComponent = (props) => (
                 [
                   {text: 'Annuler', onPress: () => {return null}},
                   {text: 'Confirmer', onPress: () => {
-                    AsyncStorage.clear();
-                    props.navigation.navigate('HomeScreen')
+                    clearAppData()
+                    .then(props.navigation.navigate('HomeScreen'))
                   }},
                 ],
                 { cancelable: false }

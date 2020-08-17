@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, View, Image, StyleSheet, Dimensions,AsyncStorage } from 'react-native';
+import { Text, View, Image, StyleSheet, Dimensions,AsyncStorage,ActivityIndicator,Alert } from 'react-native';
 
 import {Header,Left,Right,Center,Icon} from 'native-base'
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -35,6 +35,15 @@ export default class Profile extends React.Component {
           console.log("Something went wrong", error);
         }
       }
+
+      async clearAppData() {
+        try {
+            const keys = await AsyncStorage.getAllKeys();
+            await AsyncStorage.multiRemove(keys);
+        } catch (error) {
+            console.error('Error clearing app data.');
+        }
+    }
     
       makeRemoteRequest = () => {
         const url = `https://digitalconstructionhub.ovh/api/api.php?email=${this.state.email}&pass=${this.state.password}&profile=true`;
@@ -53,8 +62,59 @@ export default class Profile extends React.Component {
           .catch(error => {
             this.setState({ error, loading: false });
           });
-          console.log(this.state.data)
       };
+
+      displayJsxMessage() {
+        const {loading, error} = this.state;
+        if(loading) {
+          return(
+            <View style={styles.center}>
+              <ActivityIndicator animating={true} size='large' color='#FAB511'/>
+           </View>
+          );
+        } else {
+          return(
+            <ScrollView showsVerticalScrollIndicator={false}>
+                  <View style={styles.back} />
+                  <View style={styles.profileContainer}>
+                      <Image source={require('../src/img/avatar.png')} style={styles.profileImage}></Image>
+                      <Text style={styles.nom}> {this.state.data.first_name} {this.state.data.last_name} </Text>
+                  </View>
+  
+                  <View style={styles.listProfile}>
+                      <Image source={require('../src/img/work.png')} style={{width:35,height:35}} />
+                      <Text style={styles.textProfile}> {this.state.data.authority == 'CUSTOMER_USER'? 'Utilisateur':'Administrateur'} </Text>
+                  </View>
+  
+                  <View style={styles.listProfile}>
+                      <Image source={require('../src/img/mail.png')} style={{width:31,height:31,backgroundColor:'#fff'}} />
+                      <Text style={styles.textProfile}> {this.state.data.email} </Text>
+                  </View>
+  
+                  <TouchableOpacity style={styles.listProfileSup} onPress={()=>
+                          Alert.alert(
+                            'Suppression Compte',
+                            'Voulez-vous vous supprimer ce compte?',
+                            [
+                              {text: 'Annuler', onPress: () => {return null}},
+                              {text: 'Confirmer', onPress: () => {
+                                const url = `https://digitalconstructionhub.ovh/api/api.php?email=${this.state.email}&pass=${this.state.password}&delete=true`;
+                                fetch(url).then( () => {
+                                this.clearAppData()
+                                .then(this.props.navigation.navigate('HomeScreen'))
+                                })
+                              }},
+                            ],
+                            { cancelable: false }
+                          )  
+                        }>
+                      <Text style={styles.textProfileSup}>Supprimer</Text>
+                  </TouchableOpacity>
+              </ScrollView>
+            )
+        }
+      }
+
 
       render() {
         return (
@@ -67,30 +127,10 @@ export default class Profile extends React.Component {
                 <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
                 </Left>
             </Header>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={styles.back} />
-                <View style={styles.profileContainer}>
-                    <Image source={require('../src/img/avatar.png')} style={styles.profileImage}></Image>
-                    <Text style={styles.nom}> {this.state.data.first_name} {this.state.data.last_name} </Text>
-                </View>
-
-                <View style={styles.listProfile}>
-                    <Image source={require('../src/img/work.png')} style={{width:35,height:35}} />
-                    <Text style={styles.textProfile}> {this.state.data.authority == 'CUSTOMER_USER'? 'Utilisateur':'Administrateur'} </Text>
-                </View>
-
-                <View style={styles.listProfile}>
-                    <Image source={require('../src/img/mail.png')} style={{width:31,height:31,backgroundColor:'#fff'}} />
-                    <Text style={styles.textProfile}> {this.state.data.email} </Text>
-                </View>
-
-                <TouchableOpacity style={styles.listProfileSup}>
-                    <Text style={styles.textProfileSup}>Supprimer</Text>
-                </TouchableOpacity>
-            </ScrollView>
+            {this.displayJsxMessage()}
         </View>
-            );
-        }
+        );
+      }
 }
 
 const styles = StyleSheet.create({
@@ -156,4 +196,9 @@ textProfileSup: {
     fontWeight:'bold',
     marginLeft:10
 },
+center: {
+  flex:1,
+  justifyContent:'center',
+  alignItems:'center'
+}
 })
