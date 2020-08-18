@@ -160,6 +160,7 @@ export default class Devices extends React.Component {
                         title={`${item.name}`}
                         subtitle={item.type}
                         containerStyle={{ borderBottomWidth: 0 }}
+                        onPress={()=> {this.props.navigation.navigate('Mesures',{id:`${item.id}`,name:`${item.name}`})}}
                       />
                     )}
                     keyExtractor={item => item.name}

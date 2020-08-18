@@ -18,6 +18,12 @@ export default class Temp extends React.Component {
       searchText: "",
       filteredData: []
     };
+
+    this.FocusListener = this.props.navigation.addListener('didFocus', () => {
+      this.getGlobal().then(
+          () => {this.makeRemoteRequest();}
+        );
+    });
   }
   
   static navigationOptions = {
@@ -56,7 +62,7 @@ export default class Temp extends React.Component {
         });
       })
       .catch(error => {
-        this.setState({ error, loading: false });
+        this.setState({ error:true, loading: false, data:[{name:'Aucunes données disponibles',type:""}] });
       });
   };
 
@@ -146,7 +152,7 @@ export default class Temp extends React.Component {
           data={this.state.filteredData && this.state.filteredData.length > 0 ? this.state.filteredData : this.state.data}
           renderItem={({ item }) => (
             <ListItem
-              chevron={{color:'black'}}
+              chevron={this.state.error?{color:'white'}:{color:'black'}}
               title={`${item.name}`}
               subtitle={item.id}
               containerStyle={{ borderBottomWidth: 0 }}

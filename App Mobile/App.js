@@ -26,6 +26,7 @@ import HomeScreen from './screens/homeScreen'
 import Temp from './screens/Temp'
 import Profile from './screens/Profile'
 import Devices from './screens/devices';
+import Measure_view from './screens/Measure_view'
 
 
 const MainNavigator = createStackNavigator({
@@ -33,7 +34,8 @@ const MainNavigator = createStackNavigator({
     screen: HomeScreen,
   },
   Dashboard: Dashboard,
-  Devices:Devices
+  Devices:Devices,
+  Mesures: Measure_view
 });
 
 const clearAppData = async function() {
@@ -83,7 +85,7 @@ const MainDrawer = createDrawerNavigator({
     }
   },
   Temp: Temp,
-  Profile:Profile
+  Profile:Profile,
 }, {
   contentComponent: CustomDrawerComponent,
   contentOptions: {
