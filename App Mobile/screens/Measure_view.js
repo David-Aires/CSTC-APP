@@ -1,40 +1,61 @@
 import React from 'react';
-import {View,Text,TouchableOpacity,TouchableWithoutFeedback,StyleSheet,Image} from 'react-native';
+import {View,Text,TouchableOpacity,TouchableWithoutFeedback,StyleSheet,Image, ActivityIndicator} from 'react-native';
 import {Header,Left,Icon} from 'native-base';
 import { ScrollView } from 'react-native-gesture-handler';
+import gql from 'graphql-tag';
+import {useSubscription} from '@apollo/react-hooks';
 import Measure from '../src/components/measure';
 import Card from '../src/components/card';
 import Chart from '../src/components/chart';
 
-export default class Measure_view extends  React.Component{
-    constructor(props) {
-        super(props);
-    this.state = {
-        color : '#136DF3',
-        activestate : 'rgba(255, 255, 255, 0.291821)',
-        name:""
-        }
 
-    this.FocusListener = this.props.navigation.addListener('didFocus', () => {
-        this.setState({name:this.props.navigation.state.params.name});
+const SUBSCRIBE_TO_DATA = gql`
+            subscription {
+                ts_kv(limit:5,where: {entity_id: {_eq: "1ea67866032ec109cecbbb9a6cdb452"}}, order_by: {ts: desc}) {
+                    key
+                    dbl_v
+                }
+            }
+`;
+
+
+const Measure_view = ({navigation}) => { 
+
+    this.FocusListener = navigation.addListener('didFocus', () => {
+          const name = navigation.state.params.name;
         })
+        
+    const { data, error, loading } = useSubscription(SUBSCRIBE_TO_DATA);
+    const measure = [];
+    const tab=[];
+    choice_tab=[];
+
+    choice = (id) => {
+        choice_tab = [];
+        data.ts_kv.map((key) => {
+            if(key.key == id ) {
+                choice_tab.push(key.dbl_v)
+            }
+        })
+        console.log(choice_tab)
     }
 
-    componentDidMount() {
-        console.log(this.props.navigation.state.params.name)
-        this.setState({name:this.props.navigation.state.params.name});
-      }
 
-      static navigationOptions = {
-        header: null
-      }
-    
-    render(){
-        return(
+    if (loading) { return(
+        <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
+              <ActivityIndicator animating={true} size='large' color='#FAB511'/>
+        </View>
+    )} else {
+        if(!(choice_tab && choice_tab.length > 0)) {
+            choice(data.ts_kv[0].key);
+        }
+    }
+
+    return(
             <View style={styles.container}>
                 <Header style={{backgroundColor:'#008585'}}>
                     <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
-                    <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
+                    <Icon name='menu' onPress={() => navigation.openDrawer()} style={{color: '#fff'}}/>
                     </View>
                     <Left>
                     <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
@@ -44,15 +65,18 @@ export default class Measure_view extends  React.Component{
                 <View style={styles.containerone}>
                     <View style={styles.boxone}></View>
                     <View style={styles.boxtwo}>
-                        <Text style={styles.name}>{ this.state.name }</Text>
+                        <Text style={styles.name}> {navigation.state.params.name} </Text>
                     </View>
                     <View style={styles.boxthree}>
-                        <Chart />
+                        <Chart data={choice_tab} />
                     </View>
                     <View style={styles.boxfour}>
-                        <Measure measure='Thu' active={this.state.activestate}/>
-                        <Measure measure='Fri'/>
-                        <Measure measure='Sat'/>
+                        {data.ts_kv.map((key) => {
+                        if (!(tab.includes(key.key))) {
+                            tab.push(key.key);
+                            return (<Measure measure={key.key} choice= {()=> choice(key.key)}/>)
+                            }
+                        })}  
                     </View>
                 </View>
                 <View style={styles.containertwo}>
@@ -61,41 +85,28 @@ export default class Measure_view extends  React.Component{
                         <Text style={styles.textone}>My Progress</Text>
                     </View>
                     <View style={styles.cards}>
-                        <Card 
-                        move="bounceInLeft" 
-                        title="Mission" 
-                        subtitle="85% Completed"
-                        completed="85%"
-                        screenchange = {()=>this.change()}
-                        />
-
-                        <Card 
-                        move="bounceInRight" 
-                        title="Completed" 
-                        subtitle="5 out of 10 tasks"
-                        completed="75%"
-                        />
-
-                        <Card 
-                        move="bounceInRight" 
-                        title="Completed" 
-                        subtitle="5 out of 10 tasks"
-                        completed="75%"
-                        />
-
-                        <Card 
-                        move="bounceInRight" 
-                        title="Completed" 
-                        subtitle="5 out of 10 tasks"
-                        completed="75%"
-                        />
+                        {data.ts_kv.map((key) => {
+                            if (!(measure.includes(key.key))) {
+                                measure.push(key.key);
+                                return (
+                                    <Card 
+                                    move="bounceInLeft" 
+                                    title= {key.key }
+                                    subtitle=""
+                                    completed={key.dbl_v}
+                                    />
+                                )
+                            }
+                        })}
                     </View>
                 </View>
                 </ScrollView>
             </View>
-        );
-    }
+    );
 }
+
+export default Measure_view;
+
 const styles = StyleSheet.create({
     container : {
         flex : 1,

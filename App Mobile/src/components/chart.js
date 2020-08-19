@@ -11,6 +11,7 @@ import {
 
 export default class Chart extends React.Component{
     render(){
+
         return (
             <View>
                 <LineChart
@@ -18,21 +19,14 @@ export default class Chart extends React.Component{
                     labels: [],
                     datasets: [
                         {
-                        data: [
-                            Math.random() * 100,
-                            Math.random() * 100,
-                            Math.random() * 100,
-                            Math.random() * 100,
-                            Math.random() * 100,
-                            Math.random() * 100
-                        ]
+                        data: this.props.data
                         }
                     ]
                     }}
                     width={360} // from react-native
                     height={220}
-                    yAxisLabel="$"
-                    yAxisSuffix="k"
+                    yAxisLabel=""
+                    yAxisSuffix=""
                     yAxisInterval={1} // optional, defaults to 1
                     chartConfig={{
                     backgroundColor: "#FAB511",

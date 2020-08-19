@@ -27,8 +27,7 @@ export default class Temp extends React.Component {
   }
   
   static navigationOptions = {
-    header: null,
-    title: 'Modules',
+    header: null
   }
 
   componentDidMount() {

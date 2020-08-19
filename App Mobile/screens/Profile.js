@@ -16,7 +16,14 @@ export default class Profile extends React.Component {
         email:"",
         password:""
       };
-      }
+
+
+      this.FocusListener = this.props.navigation.addListener('didFocus', () => {
+        this.getGlobal().then(
+            () => {this.makeRemoteRequest();}
+          );
+      });
+    }
 
 
       componentDidMount() {

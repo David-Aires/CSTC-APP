@@ -1,18 +1,11 @@
 import React from 'react';
 import {View,Image,StyleSheet,Text,TouchableOpacity} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import Icon from 'react-native-vector-icons/FontAwesome5';
 
 export default class Card extends React.Component{
     render(){
         return(
             <Animatable.View animation={this.props.move} duration={1500} style={styles.cardone}>
-                <TouchableOpacity style={styles.box1} onPress={this.props.screenchange}>
-                    <View style={{backgroundColor:'#fff',height:'100%',flex:1,alignItems:'center',justifyContent:'center'}}>
-                        <Icon name='temperature-high' style={{fontSize:50}}/>
-                        {/*<Image source={this.props.image}/>*/}
-                    </View>
-                </TouchableOpacity>
                 <View style={styles.box2}>
                     <Text style={{fontSize:20,color:'#2D2D2D',letterSpacing:-0.9}}>{this.props.title}</Text>
                     <Text style={{fontSize:15,color:'#BEC4C9',letterSpacing:-0.5,paddingVertical:5}}>{this.props.subtitle}</Text>

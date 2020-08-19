@@ -9,9 +9,7 @@ export default class Dashboard extends React.Component {
     constructor(props) {
       super(props);
       }
-    static navigationOptions = {
-        header: null, 
-      };
+    
     
       state = {
         region: {
@@ -23,6 +21,10 @@ export default class Dashboard extends React.Component {
         },
     
       };
+
+      static navigationOptions = {
+        header: null
+      }
 
       componentDidMount(){
         navigator.geolocation.getCurrentPosition(position => {
