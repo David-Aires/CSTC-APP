@@ -11,7 +11,6 @@ import {
 
 export default class Chart extends React.Component{
     render(){
-
         return (
             <View>
                 <LineChart

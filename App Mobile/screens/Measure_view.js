@@ -1,5 +1,5 @@
-import React from 'react';
-import {View,Text,TouchableOpacity,TouchableWithoutFeedback,StyleSheet,Image, ActivityIndicator} from 'react-native';
+import React, { useState } from 'react';
+import {View,Text,TouchableOpacity,TouchableWithoutFeedback,StyleSheet,Image, ActivityIndicator, Dimensions} from 'react-native';
 import {Header,Left,Icon} from 'native-base';
 import { ScrollView } from 'react-native-gesture-handler';
 import gql from 'graphql-tag';
@@ -28,22 +28,35 @@ const Measure_view = ({navigation}) => {
     const { data, error, loading } = useSubscription(SUBSCRIBE_TO_DATA);
     const measure = [];
     const tab=[];
-    choice_tab=[];
+    const [choice_tab, setChoice_tab] = useState();
+    const height = Math.round(Dimensions.get('window').height)/2
 
     choice = (id) => {
-        choice_tab = [];
+        setChoice_tab([])
+        junk_tab = []
         data.ts_kv.map((key) => {
             if(key.key == id ) {
-                choice_tab.push(key.dbl_v)
+                junk_tab.push(key.dbl_v)
             }
         })
-        console.log(choice_tab)
+        junk_tab = junk_tab.reverse();
+        setChoice_tab(junk_tab);
     }
 
 
     if (loading) { return(
-        <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
-              <ActivityIndicator animating={true} size='large' color='#FAB511'/>
+        <View>
+            <Header style={{backgroundColor:'#008585'}}>
+                    <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
+                    <Icon name='menu' onPress={() => navigation.openDrawer()} style={{color: '#fff'}}/>
+                    </View>
+                    <Left>
+                    <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
+                    </Left>
+            </Header>
+            <View style={{flex:1,alignItems:'center',justifyContent:'center',marginTop:height}}>
+                <ActivityIndicator animating={true} size='large' color='#FAB511'/>
+            </View>
         </View>
     )} else {
         if(!(choice_tab && choice_tab.length > 0)) {
@@ -52,7 +65,7 @@ const Measure_view = ({navigation}) => {
     }
 
     return(
-            <View style={styles.container}>
+            <View style={{backgroundColor:'#FAB511'}}>
                 <Header style={{backgroundColor:'#008585'}}>
                     <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
                     <Icon name='menu' onPress={() => navigation.openDrawer()} style={{color: '#fff'}}/>
@@ -62,44 +75,46 @@ const Measure_view = ({navigation}) => {
                     </Left>
                 </Header>
                 <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={styles.containerone}>
-                    <View style={styles.boxone}></View>
-                    <View style={styles.boxtwo}>
-                        <Text style={styles.name}> {navigation.state.params.name} </Text>
+                    <View style={styles.container}>
+                        <View style={styles.containerone}>
+                            <View style={styles.boxone}></View>
+                            <View style={styles.boxtwo}>
+                                <Text style={styles.name}> {navigation.state.params.name} </Text>
+                            </View>
+                            <View style={styles.boxthree}>
+                                <Chart data={choice_tab} />
+                            </View>
+                            <View style={styles.boxfour}>
+                                {data.ts_kv.map((key) => {
+                                if (!(tab.includes(key.key))) {
+                                    tab.push(key.key);
+                                    return (<Measure measure={key.key} choice= {()=> choice(key.key)}/>)
+                                    }
+                                })}  
+                            </View>
+                        </View>
+                        <View style={styles.containertwo}>
+                            <View style={styles.line}></View>
+                            <View style={styles.progress}>
+                                <Text style={styles.textone}>Données enregistrées</Text>
+                            </View>
+                            <View style={styles.cards}>
+                                {data.ts_kv.map((key) => {
+                                    if (!(measure.includes(key.key))) {
+                                        measure.push(key.key);
+                                        return (
+                                            <Card 
+                                            move="bounceInLeft" 
+                                            title= {key.key }
+                                            subtitle=""
+                                            completed={key.dbl_v}
+                                            />
+                                        )
+                                    }
+                                })}
+                            </View>
+                        </View>
                     </View>
-                    <View style={styles.boxthree}>
-                        <Chart data={choice_tab} />
-                    </View>
-                    <View style={styles.boxfour}>
-                        {data.ts_kv.map((key) => {
-                        if (!(tab.includes(key.key))) {
-                            tab.push(key.key);
-                            return (<Measure measure={key.key} choice= {()=> choice(key.key)}/>)
-                            }
-                        })}  
-                    </View>
-                </View>
-                <View style={styles.containertwo}>
-                    <View style={styles.line}></View>
-                    <View style={styles.progress}>
-                        <Text style={styles.textone}>My Progress</Text>
-                    </View>
-                    <View style={styles.cards}>
-                        {data.ts_kv.map((key) => {
-                            if (!(measure.includes(key.key))) {
-                                measure.push(key.key);
-                                return (
-                                    <Card 
-                                    move="bounceInLeft" 
-                                    title= {key.key }
-                                    subtitle=""
-                                    completed={key.dbl_v}
-                                    />
-                                )
-                            }
-                        })}
-                    </View>
-                </View>
                 </ScrollView>
             </View>
     );

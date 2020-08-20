@@ -25,7 +25,7 @@ const Main = () => {
   return (
     <ApolloProvider client={client}>
       <ApolloHooksProvider client={client}>
-        <Drawer />
+        <Drawer/>
       </ApolloHooksProvider>
     </ApolloProvider>
   );

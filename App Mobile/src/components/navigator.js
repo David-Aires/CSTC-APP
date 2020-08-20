@@ -18,7 +18,7 @@ import {createAppContainer} from 'react-navigation';
 import {createStackNavigator} from 'react-navigation-stack';
 import {createDrawerNavigator, DrawerView} from 'react-navigation-drawer'
 import { DrawerNavigatorItems } from 'react-navigation-drawer'
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 
 import Dashboard from '../../screens/Dashboard'
@@ -33,11 +33,27 @@ import test from '../../screens/test'
 const MainNavigator = createStackNavigator({
   HomeScreen: {
     screen: HomeScreen,
-  },
+    navigationOptions : {
+      gesturesEnabled: false,
+    }
+  } 
+},
+{
+  headerMode: 'none',
+  initialRouteName: 'HomeScreen'
+}
+);
+
+const hideNavigator = createStackNavigator({
   Dashboard: Dashboard,
   Devices:Devices,
   Mesures: Measure_view  
-});
+},
+{
+  headerMode: 'none',
+  initialRouteName: 'Dashboard'
+}
+);
 
 const clearAppData = async function() {
   try {
@@ -82,18 +98,35 @@ const MainDrawer = createDrawerNavigator({
   Map: {
     screen: MainNavigator,
     navigationOptions : {
-      drawerIcon: ({tintColor}) => (<Icon name='streetview' style={{fontSize:14,color:tintColor}}></Icon>)
+      drawerLabel: () => null,
+      drawerLockMode: 'locked-closed'
     }
   },
-  Temp: Temp,
-  Profile:Profile,
+  'Module courant': {
+    screen: hideNavigator,
+    navigationOptions : {
+      drawerIcon: ({tintColor}) => (<Icon name='pushpino' style={{fontSize:14,color:tintColor}}></Icon>)
+    }
+  },
+  'Modules': {
+    screen: Temp,
+    navigationOptions : {
+      drawerIcon: ({tintColor}) => (<Icon name='database' style={{fontSize:14,color:tintColor}}></Icon>)
+    }
+  },
+  'Profil': {
+    screen: Profile,
+    navigationOptions : {
+      drawerIcon: ({tintColor}) => (<Icon name='user' style={{fontSize:14,color:tintColor}}></Icon>)
+    }
+  },
   Test:test
 }, {
   contentComponent: CustomDrawerComponent,
   contentOptions: {
     activeTintColor: '#C5E1A5',
     inactiveTintColor: '#fff'
-  }
+  },
 }
 )
 
