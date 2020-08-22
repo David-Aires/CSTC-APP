@@ -24,6 +24,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 
 
 
+
 const { width: WIDTH}= Dimensions.get('window')
 
  export default class HomeScreen extends React.Component{
@@ -43,7 +44,7 @@ const { width: WIDTH}= Dimensions.get('window')
     this.getToken()
     .then( () => {
       if(this.state.token) {
-        this.props.navigation.navigate('Dashboard')
+        this.props.navigation.navigate('Dashboard') 
       }
     })    
  }

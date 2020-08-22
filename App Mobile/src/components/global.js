@@ -7,5 +7,6 @@ class global extends React.Component {
         // Creating Global Variable.
         global.Email = '';
         global.Pass = '';
+        
     }
 }

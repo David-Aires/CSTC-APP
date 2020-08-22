@@ -1,80 +1,47 @@
-import React, { Component } from 'react';
-import { Text, View, Image, StyleSheet, Dimensions } from 'react-native';
+import React from 'react';
+import { Text, View, Image, StyleSheet, Dimensions, AsyncStorage } from 'react-native';
 
 import {Header,Left,Right,Center,Icon} from 'native-base'
-import MapView, { Marker } from 'react-native-maps';
+import gql from 'graphql-tag';
+import {useQuery} from '@apollo/react-hooks'
+import settings from '../src/components/settings'
 
 
-export default class Dashboard extends React.Component {
-    constructor(props) {
-      super(props);
-      }
-    
-    
-      state = {
-        region: {
-          latitude: 50.665791,
-          longitude: 4.612230,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,
-          error:null,
-        },
-    
-      };
 
-      static navigationOptions = {
-        header: null
-      }
-
-      componentDidMount(){
-        navigator.geolocation.getCurrentPosition(position => {
-          this.setState({
-            longitude: position.coords.longitude,
-            latitude: position.coords.latitude,
-            error: null,
-          });
-        }, error=> this.setState({error:error.message}),
-        {enableHighAccuracy:true,timeout:20000,maximumAge:2000});
-      }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <Header style={{backgroundColor:'#008585'}}>
-          <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
-          <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
-          </View>
-          <Left>
-          <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
-          </Left>
-        </Header>
-        <MapView 
-        region={{ 
-          latitude: 50.665791,
-          longitude: 4.612230,
-          latitudeDelta: 0.005,
-          longitudeDelta: 0.005,}}
-        zoomEnabled={true}
-        style={styles.mapStyle}>
-          <Marker coordinate={this.state} />
-        </MapView>
-      </View>
-    );
+async function getGlobal() {
+  try {
+    const email = await AsyncStorage.getItem("global.Email");
+    const password= await AsyncStorage.getItem("global.Pass");
+    return {
+      email : email,
+      password: password
+    }
+  } catch (error) {
+    console.log("Something went wrong", error);
   }
 }
+
+
+const Dashboard = ({navigation}) => {
+
+  getGlobal().then( (data) => {
+    const url = `https://digitalconstructionhub.ovh/api/api.php?email=${data.email}&pass=${data.password}&asset=true`;
+    fetch(url)
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+      })
+      .catch(error => {
+        this.setState({ error:true, loading: false});
+      });
+  })
+ 
+  return (
+    <View>
+      <Text> test </Text>
+    </View>
+  )
   
+}
 
-
-
-const styles = StyleSheet.create({
-  container : {
-    flex: 1,
-  },
-  mapStyle: {
-
-    width: Dimensions.get('window').width,
-
-    height: Dimensions.get('window').height,
-
-  },
-})
+export default Dashboard;

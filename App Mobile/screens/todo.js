@@ -8,11 +8,11 @@ import {Header,Left,Icon} from 'native-base'
 import gql from 'graphql-tag';
 import TodoList from '../src/components/todoList'
 import AddTodoModal from '../src/components/AddTodoModal'
-import { useQuery } from "@apollo/react-hooks";
+import '../src/components/global.js'
 
 export const FETCH_TODOS = gql`
   query {
-    todos(where: {id_customer: {_eq: "1ea5df09d9197409cecbbb9a6cdb452"}}) {
+    todos(where: {id_customer: {_eq: "${global.Group}"}}) {
       id
       id_customer
       text

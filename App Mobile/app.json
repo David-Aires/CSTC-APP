@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "GreenR",
-    "slug": "GreenR",
+    "name": "CSTC Platform",
+    "slug": "CSTC",
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": [
@@ -25,6 +25,9 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android" : {
+      "package" : "com.cstc.cstcPlatform",
     }
   }
 }
