@@ -19,6 +19,8 @@ import {createStackNavigator} from 'react-navigation-stack';
 import {createDrawerNavigator, DrawerView} from 'react-navigation-drawer'
 import { DrawerNavigatorItems } from 'react-navigation-drawer'
 import Icon from 'react-native-vector-icons/AntDesign';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
+import { NavigationActions, StackActions } from 'react-navigation';
 
 
 import Dashboard from '../../screens/Dashboard'
@@ -27,7 +29,7 @@ import Temp from '../../screens/Temp'
 import Profile from '../../screens/Profile'
 import Devices from '../../screens/devices';
 import Measure_view from '../../screens/Measure_view'
-import test from '../../screens/test'
+import todo from '../../screens/todo'
 
 
 const MainNavigator = createStackNavigator({
@@ -51,8 +53,11 @@ const hideNavigator = createStackNavigator({
 },
 {
   headerMode: 'none',
-  initialRouteName: 'Dashboard'
-}
+  initialRouteName: 'Dashboard',
+  navigationOptions: ({navigation}) => ({
+    gesturesEnabled: false,
+    })
+  }
 );
 
 const clearAppData = async function() {
@@ -71,7 +76,25 @@ const CustomDrawerComponent = (props) => (
       <Image source={require('../img/icon.png')} style={{height: 60, width:70}} />
     </View>
     <ScrollView>
-      <DrawerNavigatorItems {...props}/>
+      <DrawerNavigatorItems {...props}
+      onItemPress={(route, focused) => {
+        if (route.route.routeName == "Modules" && (props.activeItemKey=="Module courant" || props.activeItemKey=="Modules")) {
+          
+            const resetAction = StackActions.reset({
+              index: 0,
+              key: null,
+              actions: [NavigationActions.navigate({ routeName: 'Dashboard' })],
+            });
+            props.navigation.dispatch(resetAction);
+            props.navigation.navigate('Modules')    
+        }
+    
+      props.onItemPress(route);
+    }}
+      
+      
+      
+      />
         <TouchableOpacity onPress={()=>
               Alert.alert(
                 'Log out',
@@ -120,9 +143,16 @@ const MainDrawer = createDrawerNavigator({
       drawerIcon: ({tintColor}) => (<Icon name='user' style={{fontSize:14,color:tintColor}}></Icon>)
     }
   },
-  Test:test
+  'Tâches': {
+    screen: todo,
+    navigationOptions : {
+      drawerIcon: ({tintColor}) => (<FontAwesome5 name='tasks' style={{fontSize:14,color:tintColor}}></FontAwesome5>)
+    }
+  }
+  
 }, {
   contentComponent: CustomDrawerComponent,
+  headerMode: 'none',
   contentOptions: {
     activeTintColor: '#C5E1A5',
     inactiveTintColor: '#fff'

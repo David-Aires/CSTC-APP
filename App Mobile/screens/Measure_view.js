@@ -4,19 +4,11 @@ import {Header,Left,Icon} from 'native-base';
 import { ScrollView } from 'react-native-gesture-handler';
 import gql from 'graphql-tag';
 import {useSubscription} from '@apollo/react-hooks';
-import Measure from '../src/components/measure';
 import Card from '../src/components/card';
 import Chart from '../src/components/chart';
 
 
-const SUBSCRIBE_TO_DATA = gql`
-            subscription {
-                ts_kv(limit:5,where: {entity_id: {_eq: "1ea67866032ec109cecbbb9a6cdb452"}}, order_by: {ts: desc}) {
-                    key
-                    dbl_v
-                }
-            }
-`;
+
 
 
 const Measure_view = ({navigation}) => { 
@@ -24,23 +16,33 @@ const Measure_view = ({navigation}) => {
     this.FocusListener = navigation.addListener('didFocus', () => {
           const name = navigation.state.params.name;
         })
+
+        const SUBSCRIBE_TO_DATA = gql`
+        subscription {
+            ts_kv(where: {entity_id: {_eq: "${navigation.state.params.id}"}},limit:45,order_by: {ts: desc}) {
+                key
+                dbl_v
+            }
+        }
+`;
         
     const { data, error, loading } = useSubscription(SUBSCRIBE_TO_DATA);
     const measure = [];
     const tab=[];
     const [choice_tab, setChoice_tab] = useState();
     const height = Math.round(Dimensions.get('window').height)/2
+   
 
-    choice = (id) => {
-        setChoice_tab([])
-        junk_tab = []
+    choice = (id) => {   
+        junk_tab = [];
         data.ts_kv.map((key) => {
             if(key.key == id ) {
                 junk_tab.push(key.dbl_v)
             }
         })
-        junk_tab = junk_tab.reverse();
-        setChoice_tab(junk_tab);
+        junk_tab = junk_tab.slice(0,10).reverse();
+        console.log(junk_tab)
+        return junk_tab
     }
 
 
@@ -58,11 +60,33 @@ const Measure_view = ({navigation}) => {
                 <ActivityIndicator animating={true} size='large' color='#FAB511'/>
             </View>
         </View>
-    )} else {
-        if(!(choice_tab && choice_tab.length > 0)) {
-            choice(data.ts_kv[0].key);
-        }
+    )} else if(data.ts_kv.length == 0 ) {
+        console.log(data.ts_kv)
+        return (
+            <View style={{backgroundColor:'#FAB511'}}>
+                <Header style={{backgroundColor:'#008585'}}>
+                    <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
+                    <Icon name='menu' onPress={() => navigation.openDrawer()} style={{color: '#fff'}}/>
+                    </View>
+                    <Left>
+                    <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
+                    </Left>
+                </Header>
+                <Text style={styles.subtitle} >
+                    Aucunes données disponibles
+                </Text>
+            </View>
+        )
+    } else {
+        data.ts_kv.map((key) => {
+            if (!(tab.includes(key.key))) {
+                tab.push(key.key);
+            }
+        })
     }
+        
+    
+
 
     return(
             <View style={{backgroundColor:'#FAB511'}}>
@@ -82,16 +106,18 @@ const Measure_view = ({navigation}) => {
                                 <Text style={styles.name}> {navigation.state.params.name} </Text>
                             </View>
                             <View style={styles.boxthree}>
-                                <Chart data={choice_tab} />
+                                {tab.map((key) => {
+                                    return (
+                                    <View>
+                                        <Text style={styles.subtitle}> {key} </Text>
+                                        <Chart data={choice(key)} />
+                                    </View>
+                                    )
+                                })
+                                }
+                                
                             </View>
-                            <View style={styles.boxfour}>
-                                {data.ts_kv.map((key) => {
-                                if (!(tab.includes(key.key))) {
-                                    tab.push(key.key);
-                                    return (<Measure measure={key.key} choice= {()=> choice(key.key)}/>)
-                                    }
-                                })}  
-                            </View>
+                            <View style={styles.boxfour}></View>
                         </View>
                         <View style={styles.containertwo}>
                             <View style={styles.line}></View>

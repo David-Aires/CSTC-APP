@@ -36,6 +36,7 @@ export default class Temp extends React.Component {
     );
   }
 
+
   async getGlobal() {
     try {
       this.setState({ email: await AsyncStorage.getItem("global.Email")});
@@ -134,40 +135,43 @@ export default class Temp extends React.Component {
     this.setState({filteredData: filteredData});
   };
 
+
+           
+ 
   
 
-  render() {
+  render() { 
     return (
-      <View>
-        <Header style={{backgroundColor:'#008585'}}>
-          <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
-          <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
+        <View>
+          <Header style={{backgroundColor:'#008585'}}>
+            <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
+            <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
+            </View>
+            <Left>
+            <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
+            </Left>
+          </Header>
+            <FlatList
+                data={this.state.filteredData && this.state.filteredData.length > 0 ? this.state.filteredData : this.state.data}
+                renderItem={({ item }) => (
+                  <ListItem
+                    chevron={this.state.error?{color:'white'}:{color:'black'}}
+                    title={`${item.name}`}
+                    subtitle={item.id}
+                    containerStyle={{ borderBottomWidth: 0 }}
+                    onPress={()=> {this.props.navigation.navigate('Devices',{id:`${item.id}`,email:`${this.state.email}`,pass:`${this.state.password}`})}}
+                  />
+                )}
+                keyExtractor={item => item.name}
+                ItemSeparatorComponent={this.renderSeparator}
+                ListHeaderComponent={this.renderHeader}
+                ListFooterComponent={this.renderFooter}
+                onRefresh={this.handleRefresh}
+                refreshing={this.state.refreshing}
+                onEndReached={this.handleLoadMore}
+                onEndReachedThreshold={50}
+              />
           </View>
-          <Left>
-          <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
-          </Left>
-        </Header>
-        <FlatList
-          data={this.state.filteredData && this.state.filteredData.length > 0 ? this.state.filteredData : this.state.data}
-          renderItem={({ item }) => (
-            <ListItem
-              chevron={this.state.error?{color:'white'}:{color:'black'}}
-              title={`${item.name}`}
-              subtitle={item.id}
-              containerStyle={{ borderBottomWidth: 0 }}
-              onPress={()=> {this.props.navigation.navigate('Devices',{id:`${item.id}`,email:`${this.state.email}`,pass:`${this.state.password}`})}}
-            />
-          )}
-          keyExtractor={item => item.name}
-          ItemSeparatorComponent={this.renderSeparator}
-          ListHeaderComponent={this.renderHeader}
-          ListFooterComponent={this.renderFooter}
-          onRefresh={this.handleRefresh}
-          refreshing={this.state.refreshing}
-          onEndReached={this.handleLoadMore}
-          onEndReachedThreshold={50}
-        />
-        </View>
-    );
-  }
+      );
+    }
 }
