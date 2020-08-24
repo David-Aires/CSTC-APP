@@ -44,7 +44,7 @@ const DELETE_TODO = gql`
 `;
 
 
-export default TodoList = ({list}) => {
+export default TodoList = ({list,query}) => {
     return (    
             <View style={[styles.listContainer, {backgroundColor: '#FAB511'}]}>
                  <Mutation
@@ -71,13 +71,13 @@ export default TodoList = ({list}) => {
                 }}
                 update={(cache) => {
                   const data = cache.readQuery({
-                    query: FETCH_TODOS
+                    query: query
                   });
                   const newData = {
                     todos: data.todos.filter((t) => t.id !== list.id)
                   }
                   cache.writeQuery({
-                    query: FETCH_TODOS,
+                    query: query,
                     data: newData
                   });
                 }}

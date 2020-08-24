@@ -23,6 +23,8 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'
 import { NavigationActions, StackActions } from 'react-navigation';
 
 
+
+
 import Dashboard from '../../screens/Dashboard'
 import HomeScreen from '../../screens/homeScreen'
 import Temp from '../../screens/Temp'
@@ -30,6 +32,7 @@ import Profile from '../../screens/Profile'
 import Devices from '../../screens/devices';
 import Measure_view from '../../screens/Measure_view'
 import todo from '../../screens/todo'
+
 
 
 const MainNavigator = createStackNavigator({
@@ -103,7 +106,9 @@ const CustomDrawerComponent = (props) => (
                   {text: 'Annuler', onPress: () => {return null}},
                   {text: 'Confirmer', onPress: () => {
                     clearAppData()
-                    .then(props.navigation.navigate('HomeScreen'))
+                    .then( () => {
+                        props.navigation.navigate('HomeScreen')
+                    }) 
                   }},
                 ],
                 { cancelable: false }

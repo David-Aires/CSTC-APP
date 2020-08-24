@@ -1,77 +1,73 @@
-import React from "react";
-import {StyleSheet,Text,View, FlatList, ActivityIndicator, Modal, Image} from "react-native";
+import React, { useState, useEffect } from "react";
+import {StyleSheet,Text,View, FlatList, ActivityIndicator, Modal, Image, Dimensions} from "react-native";
 import colors from '../src/components/color'
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {AntDesign} from "@expo/vector-icons";
-import { Query } from 'react-apollo'
 import {Header,Left,Icon} from 'native-base'
 import gql from 'graphql-tag';
 import TodoList from '../src/components/todoList'
 import AddTodoModal from '../src/components/AddTodoModal'
 import '../src/components/global.js'
+import settings from '../src/components/settings'
+import { useQuery, useSubscription } from "@apollo/react-hooks";
 
-export const FETCH_TODOS = gql`
-  query {
-    todos(where: {id_customer: {_eq: "${global.Group}"}}) {
-      id
-      id_customer
-      text
-      is_completed
-    }
-  }
-`;
 
-export default class Todo extends React.Component {
-    state = {
-        addTodoVisible: false,
-    };
+
+
+
+const Todo = ({navigation}) => {
 
     
 
-    toggleAddTodoModal() {
-        this.setState({addTodoVisible: !this.state.addTodoVisible})
-    }
-
-   
-
-    
-
-    
-    
-
-    render() {
-        
-        return (
-            <Query
-            fetchPolicy={'network-only'}
-        query={FETCH_TODOS}
-      >
-        {
-          ({data, error, loading}) => {
-            if (error || loading) {
-              return  (
-              <View style={styles.center}>
-                <ActivityIndicator animating={true} size='large' color='#FAB511'/>
-             </View>
-             )
+    const FETCH_TODOS = gql`
+        query {
+            todos(where: {id_customer: {_eq:"${settings.group}"}}) {
+            id
+            id_customer
+            text
+            is_completed
             }
+        }
+    `;
+
+    const [addTodoVisible,setaddTodoVisible] = useState(false);
+    const { data, error, loading, refetch} = useQuery(FETCH_TODOS);
+    const height = Math.round(Dimensions.get('window').height)/2
+    
+
+        if (loading) {
             return (
-                <View style={{flex:1}}>
+                <View>
                     <Header style={{backgroundColor:'#008585'}}>
-                        <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
-                        <Icon name='menu' onPress={() => this.props.navigation.openDrawer()} style={{color: '#fff'}}/>
-                        </View>
-                        <Left>
-                        <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
-                        </Left>
+                            <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
+                            <Icon name='menu' onPress={() => navigation.openDrawer()} style={{color: '#fff'}}/>
+                            </View>
+                            <Left>
+                            <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
+                            </Left>
+                    </Header>
+                    <View style={{flex:1,alignItems:'center',justifyContent:'center',marginTop:height}}>
+                        <ActivityIndicator animating={true} size='large' color='#FAB511'/>
+                    </View>
+                </View>
+            )} 
+        return (
+            <View style={{flex:1}}>
+                    <Header style={{backgroundColor:'#008585'}}>
+                            <View style={{alignContent:'center',alignItems:'center',flex:1,flexDirection:'row'}}>
+                            <Icon name='menu' onPress={() => navigation.openDrawer()} style={{color: '#fff'}}/>
+                            </View>
+                            <Left>
+                            <Image style={{width:40,height:35}} source={require('../src/img/icon.png')}/>
+                            </Left>
                     </Header>
                     <View style={styles.container}>
                         <Modal 
                         animationType="slide" 
-                        visible={this.state.addTodoVisible}
-                        onRequestClose={()=>this.toggleAddTodoModal()}
+                        visible={addTodoVisible}
+                        onRequestClose={()=> setaddTodoVisible(!addTodoVisible)}
                         >
-                            <AddTodoModal closeModal={()=> this.toggleAddTodoModal()} id_customer='1ea5df09d9197409cecbbb9a6cdb452'/>
+                            <AddTodoModal closeModal={()=> setaddTodoVisible(!addTodoVisible)} id_customer={settings.group} query={FETCH_TODOS} />
                         </Modal>
                         <View style={{flexDirection:'row'}}>
                             <Text style={styles.title}>
@@ -80,33 +76,33 @@ export default class Todo extends React.Component {
                             <View style={styles.divider}/>
                         </View>
 
-                        <View style={{marginVertical:48}} >
-                            <TouchableOpacity style={styles.addList} onPress={()=> this.toggleAddTodoModal()}>
+                        <View style={{marginVertical:48,flexDirection:'row'}} >
+                            <TouchableOpacity style={[styles.addList,{marginRight:20}]} onPress={()=> setaddTodoVisible(!addTodoVisible)}>
                                 <AntDesign name='plus' size={16} color={colors.orange} />
                             </TouchableOpacity>
+                            <TouchableOpacity style={styles.addList} onPress={refetch}>
+                                <AntDesign name='loading1' size={16} color={colors.orange} />
+                            </TouchableOpacity>
+                            
 
-                            <Text style={styles.add} >Ajouter</Text>
+                            
                         </View>
 
                         <View style={{height:275, paddingLeft: 32}}>
                             <FlatList
                             data={data.todos}
-                            renderItem= {(item) => <TodoList list={item.item}/>}
+                            renderItem= {(item) => <TodoList list={item.item} query={FETCH_TODOS}/>}
                             keyExtractor= {(item) => item.id.toString()}
                             horizontal= {true}
                             showsHorizontalScrollIndicator={false}
-                            keyboardShouldPersistTaps="always"
                             />
                         </View>
                     </View>
-                </View>
-            )
-          }
-        }
-      </Query>
-    )
-  }
+            </View>
+        )
 }
+
+export default Todo
 
 
 

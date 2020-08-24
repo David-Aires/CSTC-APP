@@ -44,7 +44,7 @@ export default class AddTodoModal extends React.Component {
         update={(cache, {data: {insert_todos}}) => {
             console.log(FETCH_TODOS)
           const data = cache.readQuery({
-            query: FETCH_TODOS,
+            query: this.props.query,
           });
           
           const newTodo = insert_todos.returning[0];
@@ -52,7 +52,7 @@ export default class AddTodoModal extends React.Component {
             todos: [ newTodo, ...data.todos]
           }
           cache.writeQuery({
-            query: FETCH_TODOS,
+            query: this.props.query,
             data: newData
           });
         }}

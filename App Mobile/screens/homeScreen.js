@@ -36,7 +36,8 @@ const { width: WIDTH}= Dimensions.get('window')
       email: "",
       password: "",
       userData: "",
-      token: ""
+      token: "",
+      wrong: false
     }
   }
 
@@ -101,9 +102,10 @@ const { width: WIDTH}= Dimensions.get('window')
       .then((responseJson) => {
         if(responseJson.token) {
           this.storeToken(responseJson.token,email,password)
+          this.setState({wrong:false})
           this.props.navigation.navigate("Dashboard")
         } else {
-          alert('wrong');
+          this.setState({wrong:true})
         }
     })
       .catch((error) => {
@@ -145,8 +147,9 @@ const { width: WIDTH}= Dimensions.get('window')
             <Icon name={this.state.press == false?'ios-eye':'ios-eye-off'} size={27} color={'rgba(255,255,255,0.7)'} />
           </TouchableOpacity>
         </View>
-        
-
+        {
+          this.state.wrong?(<Text style={{color: 'red',paddingTop:10}}>Mauvais mot de passe ou pseudo</Text>):<Text></Text>
+        }
         <TouchableOpacity style={styles.btnLogin} onPress={() => this.login(this.state.email, this.state.password)}>
           <Text style={styles.text} >Login</Text>
         </TouchableOpacity>
