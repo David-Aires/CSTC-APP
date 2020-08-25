@@ -68,6 +68,9 @@ switch(true) {
 
         } elseif(!empty($_GET["devices"]) AND !empty($_GET["id"]) ) {
             getDevices($_GET["id"]);
+        } elseif(!empty($_GET["group"])) {
+            header('Content-Type: application/json');
+            echo '{"id_customer": "'.UUIDencode($usr_data->customerId).'"}';
         }
     break;
 

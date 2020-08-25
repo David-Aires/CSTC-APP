@@ -1,0 +1,76 @@
+version: "3"
+
+services:
+  chirpstack-network-server:
+    image: chirpstack/chirpstack-network-server:3
+    volumes:
+      - ./configuration/chirpstack-network-server:/etc/chirpstack-network-server
+
+  chirpstack-application-server:
+    image: chirpstack/chirpstack-application-server:3
+    ports:
+      - 8080:8080
+    volumes:
+      - ./configuration/chirpstack-application-server:/etc/chirpstack-application-server
+
+  chirpstack-gateway-bridge:
+    image: chirpstack/chirpstack-gateway-bridge:3
+    ports:
+      - 1700:1700/udp
+    volumes:
+      - ./configuration/chirpstack-gateway-bridge:/etc/chirpstack-gateway-bridge
+
+  chirpstack-geolocation-server:
+    image: chirpstack/chirpstack-geolocation-server:3
+    volumes:
+      - ./configuration/chirpstack-geolocation-server:/etc/chirpstack-geolocation-server
+
+  postgresql:
+    image: postgres:9.6-alpine
+    environment:
+      - POSTGRES_PASSWORD=""
+    volumes:
+      - ./configuration/postgresql/initdb:/docker-entrypoint-initdb.d
+      - postgresqldata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:5-alpine
+    volumes:
+      - redisdata:/data
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+	  
+  thingsboard:
+	restart: always
+    image: store/thingsboard/tb-pe:3.1.0PE
+	environment:
+      TB_QUEUE_TYPE: in-memory
+      TB_LICENSE_SECRET: PUT_YOUR_LICENSE_SECRET_HERE
+      TB_LICENSE_INSTANCE_DATA_FILE: /data/license.data
+    volumes:
+      - thingsboarddata:/data
+    ports:
+      - 9090:9090
+	  - 5433:5432
+	  
+  hasura
+	restart: always
+	image: hasura/graphql-engine:v1.3.1
+	environment:
+		HASURA_GRAPHQL_DEV_MODE=true
+		HASURA_GRAPHQL_ENABLE_CONSOLE=true
+		HASURA_GRAPHQL_DATABASE_URL=postgres://username:password@hostname:port/dbname
+	volumes:
+      - hasuradata:/data
+    ports:
+      - 7070:8080
+
+
+volumes:
+  postgresqldata:
+  redisdata:
+  thingsboarddata:
+  hasuradata:
